@@ -68,16 +68,49 @@ begin
 	stimulus: process
 	begin
 		report "simulation start";
-
-		-- Apply test stimuli
+		--reset
 		res_n <= '0';
+		wait until rising_edge(clk); 
+		wait until rising_edge(clk); 
+		wait until rising_edge(clk); 
+
+
+		--apply inputs
+		operand_data_in <= (others=>'0');
+		store_operand1 <= '0';
+		store_operand2 <= '0';
+		sub <= '0';
+		wait until rising_edge(clk); 
+
+		--start 
+		res_n <= '1';
+		wait until rising_edge(clk); 
+
+		--store operand1
+		operand_data_in <= (0=>'1',others=>'0');
+		store_operand1 <= '1';
+		wait until rising_edge(clk); 
+		wait until rising_edge(clk); 
+
+		--store operand2
+		operand_data_in <= (2=>'1',others=>'0');
+		store_operand1 <= '0';
+		store_operand2 <= '1';
+		wait until rising_edge(clk); 
+		wait until rising_edge(clk); 
+
+		--sub operand1 and operand2
+		sub <= '1';
+		wait until rising_edge(clk); 
+
+		--wait loooong
 		wait for 50 ns;
+
+		--assert 1 = 0 report "Test x failed" severity error;
+
+		--stop sim
 		clk_stop <= '1';
-
-		wait for 10 ns;
-		assert 1 = 0 report "Test x failed" severity error;
-
-		report "simulation end";
+		report "simulation done";
 		-- End simulation
 		wait;
 	end process;

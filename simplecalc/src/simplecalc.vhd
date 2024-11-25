@@ -42,7 +42,7 @@ begin
 					local_op1 <= operand_data_in;
 				end if;
 
-				if store_operand2='1' then 
+				if store_operand2 ='1' then 
 					local_op2 <= operand_data_in;
 				end if;
 
