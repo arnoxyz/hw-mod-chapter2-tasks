@@ -51,7 +51,7 @@ begin
 
 	-- Instantiate the unit under test
 	UUT : simplecalc
-	generic map( DATA_WIDTH => DATA_WIDTH)
+	generic map(DATA_WIDTH => DATA_WIDTH)
 	port map(
 			clk    => clk,
 			res_n  => res_n,
@@ -107,6 +107,11 @@ begin
 		wait for 50 ns;
 
 		--assert 1 = 0 report "Test x failed" severity error;
+
+
+		--TODO: implement procedure add(input1, input2)
+		--TODO: implement procedure sub(input1, input2)
+		--TODO: check with assertions
 
 		--stop sim
 		clk_stop <= '1';

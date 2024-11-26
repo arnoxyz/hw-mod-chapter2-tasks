@@ -51,9 +51,9 @@ begin
 				operand2 <= local_op2;
 
 				if sub='1' then 
-					result <= std_logic_vector(unsigned(local_op1) - unsigned(local_op2));
+					result <= std_ulogic_vector(unsigned(local_op1) - unsigned(local_op2));
 				else 
-					result <= std_logic_vector(unsigned(local_op1) + unsigned(local_op2));
+					result <= std_ulogic_vector(unsigned(local_op1) + unsigned(local_op2));
 				end if;
 			end if;
 		end if;
