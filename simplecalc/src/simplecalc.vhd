@@ -26,6 +26,9 @@ end entity;
 architecture arch of simplecalc is
 	signal local_op1 : std_ulogic_vector(DATA_WIDTH-1 downto 0);
 	signal local_op2 : std_ulogic_vector(DATA_WIDTH-1 downto 0);
+
+	signal local_store_operand1_n : std_ulogic;
+	signal local_store_operand2_n : std_ulogic;
 begin
 
 	--clk process with async low-active reset
@@ -35,16 +38,26 @@ begin
 			--reset all registers
 			local_op1 <= (others=>'0');			
 			local_op2 <= (others=>'0');			
+			local_store_operand1_n <= '1';
+			local_store_operand2_n <= '1';
 		else 
 			if rising_edge(clk) then 
 				--read new data logic
-				if store_operand1='1' then 
+
+				--detect operand1 transition
+				--active-low signal so btn is pressed when last entry is 1 and current is 0 
+				if local_store_operand1_n='1' and store_operand1='0' then 
 					local_op1 <= operand_data_in;
 				end if;
 
-				if store_operand2 ='1' then 
-					local_op2 <= operand_data_in;
+				--same for operand2 transition
+				if local_store_operand2_n='1' and store_operand2='0' then 
+					local_op1 <= operand_data_in;
 				end if;
+
+				--store the operand information 
+				local_store_operand1_n <= store_operand1;
+				local_store_operand2_n <= store_operand2;
 
 				--calc and output logic
 				operand1 <= local_op1;

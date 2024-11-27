@@ -11,15 +11,15 @@ architecture bench of simplecalc_tb is
 
 	--clock stuff
 	constant clk_period : time := 2 ns; --50 ns =same as the fpga board clk
-	signal clk : std_ulogic := '0';
-	signal clk_stop : std_ulogic := '0';
+	signal clk 	        : std_ulogic := '0';
+	signal clk_stop     : std_ulogic := '0';
 
 	--in signals
-	signal res_n  			: std_ulogic;
+	signal res_n  		   : std_ulogic;
 	signal operand_data_in : std_ulogic_vector(DATA_WIDTH-1 downto 0);
 	signal store_operand1  : std_ulogic;
 	signal store_operand2  : std_ulogic;
-	signal sub 			: std_ulogic;
+	signal sub 			   : std_ulogic;
 
 	--out signals
 	signal operand1 : std_ulogic_vector(DATA_WIDTH-1 downto 0);
@@ -47,6 +47,10 @@ architecture bench of simplecalc_tb is
 		);
 	end component;
 
+
+	--enum for valid btns
+	type btn_t is (btn_operand1, btn_operand2);
+
 begin
 
 	-- Instantiate the unit under test
@@ -66,53 +70,82 @@ begin
 
 	-- Stimulus process
 	stimulus: process
-	begin
-		report "simulation start";
-		--reset
-		res_n <= '0';
-		wait until rising_edge(clk); 
-		wait until rising_edge(clk); 
-		wait until rising_edge(clk); 
+		--procedure simulate_btn_press(btn); 
+		procedure btn_press(btn : btn_t) is 
+		begin 
+			case btn is 
+				when btn_operand1 => 
+					report "btn1_pressed";
+					store_operand1 <= '0';
+					wait for clk_period*10;
+					store_operand1 <= '1';
+					wait for clk_period*5;
 
+				when btn_operand2 => 
+					report "btn2_pressed";
+					store_operand2 <= '0';
+					wait for clk_period*20;
+					store_operand2 <= '1';
+					wait for clk_period*5;
 
-		--apply inputs
-		operand_data_in <= (others=>'0');
-		store_operand1 <= '0';
-		store_operand2 <= '0';
-		sub <= '0';
-		wait until rising_edge(clk); 
-
-		--start 
-		res_n <= '1';
-		wait until rising_edge(clk); 
-
-		--store operand1
-		operand_data_in <= (0=>'1',others=>'0');
-		store_operand1 <= '1';
-		wait until rising_edge(clk); 
-		wait until rising_edge(clk); 
-
-		--store operand2
-		operand_data_in <= (2=>'1',others=>'0');
-		store_operand1 <= '0';
-		store_operand2 <= '1';
-		wait until rising_edge(clk); 
-		wait until rising_edge(clk); 
-
-		--sub operand1 and operand2
-		sub <= '1';
-		wait until rising_edge(clk); 
-
-		--wait loooong
-		wait for 50 ns;
-
-		--assert 1 = 0 report "Test x failed" severity error;
-
+				when others =>  report "invalid input for btn";
+			end case;
+		end procedure;
 
 		--TODO: implement procedure add(input1, input2)
 		--TODO: implement procedure sub(input1, input2)
+		--TODO: merge add,sub to one procedure -> operation(input1, input2, op)
 		--TODO: check with assertions
+		-- --store_operand1 and store_operand2 are active low so -> 
+		-- --apply inputs
+		-- operand_data_in <= (others=>'0');
+		-- store_operand1 <= '1';
+		-- store_operand2 <= '1';
+		-- sub <= '0';
+		-- wait until rising_edge(clk); 
 
+		-- --start 
+		-- res_n <= '1';
+		-- wait until rising_edge(clk); 
+
+		-- --store operand1
+		-- operand_data_in <= (0=>'1',others=>'0');
+		-- store_operand1 <= '0';
+		-- wait until rising_edge(clk); 
+		-- wait until rising_edge(clk); 
+		-- store_operand1 <= '1';
+
+	begin
+		report "start sim";
+		wait for 5*clk_period;
+		report "start reset";
+		--reset
+		res_n <= '0';
+		wait for 5*clk_period;
+		wait until rising_edge(clk); 
+
+		report "reset off";
+		operand_data_in <= (others=>'0');
+		res_n <= '1';
+		store_operand1 <= '1';
+		store_operand2 <= '1';
+		sub <= '0';
+		wait for 5*clk_period;
+		wait until rising_edge(clk); 
+
+		--simulate btn_press
+		operand_data_in <= x"BA";
+		btn_press(btn_operand1);
+		operand_data_in <= x"AB";
+		btn_press(btn_operand1);
+
+
+		--btn_press(btn_operand2);
+
+		--simulate add/sub
+
+
+		
 		--stop sim
 		clk_stop <= '1';
 		report "simulation done";
