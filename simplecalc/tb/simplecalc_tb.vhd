@@ -173,13 +173,19 @@ begin
 		uut_sub(10,10);
 		uut_sub(15,5);
 		uut_sub(19,8);
-		uut_sub(100,1);
+		uut_sub(5,11);
 
 
 		--grindiger counter
 		report "start grindiger counter";
-		for i in 0 to 100 loop
+		for i in 0 to 10 loop
 			uut_add(i,0);
+		end loop;
+
+		--grindiger countdown
+		report "start grindiger countdown";
+		for j in 0 to 10 loop
+			uut_sub(10,j);
 		end loop;
 
 		
