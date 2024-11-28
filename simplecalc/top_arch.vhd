@@ -56,4 +56,6 @@ begin
 	hex3 <= to_segs(local_result_output(7 downto 4));
 	hex2 <= to_segs(local_result_output(3 downto 0));
 
+	hex1 <= to_segs("0000");
+	hex0 <= to_segs("0000");
 end architecture;
