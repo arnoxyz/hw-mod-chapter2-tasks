@@ -71,7 +71,7 @@ begin
 	-- Stimulus process
 	stimulus: process
 		--procedure simulate_btn_press(btn); 
-		procedure btn_press(btn : btn_t) is 
+		procedure press_btn(btn : btn_t) is 
 		begin 
 			case btn is 
 				when btn_operand1 => 
@@ -92,58 +92,95 @@ begin
 			end case;
 		end procedure;
 
-		--TODO: implement procedure add(input1, input2)
-		--TODO: implement procedure sub(input1, input2)
-		--TODO: merge add,sub to one procedure -> operation(input1, input2, op)
-		--TODO: check with assertions
-		-- --store_operand1 and store_operand2 are active low so -> 
-		-- --apply inputs
-		-- operand_data_in <= (others=>'0');
-		-- store_operand1 <= '1';
-		-- store_operand2 <= '1';
-		-- sub <= '0';
-		-- wait until rising_edge(clk); 
+		procedure uut_add(input1 : integer; input2 : integer) is 
+			constant local_input1_vec : std_ulogic_vector(DATA_WIDTH-1 downto 0) := std_ulogic_vector(std_ulogic_vector(to_unsigned(input1,8)));
+			constant local_input2_vec : std_ulogic_vector(DATA_WIDTH-1 downto 0) := std_ulogic_vector(std_ulogic_vector(to_unsigned(input2,8)));
+			constant local_result : integer := input1+input2;
+		begin 
+			--btn1 press and store input1
+			report "store data in input1";
+			operand_data_in <= local_input1_vec;
+			press_btn(btn_operand1);
+			assert operand1 = local_input1_vec report "failed storing input1 into operand1 = " & to_string(operand1) & " /= " & to_string(local_input1_vec);
 
-		-- --start 
-		-- res_n <= '1';
-		-- wait until rising_edge(clk); 
+			--btn2 press and store input2
+			report "store data in input2";
+			operand_data_in <= local_input2_vec;
+			press_btn(btn_operand2);
+			assert operand2 = local_input2_vec report "failed storing input2 into operand2 = " & to_string(operand2) & " /= " & to_string(local_input2_vec);
 
-		-- --store operand1
-		-- operand_data_in <= (0=>'1',others=>'0');
-		-- store_operand1 <= '0';
-		-- wait until rising_edge(clk); 
-		-- wait until rising_edge(clk); 
-		-- store_operand1 <= '1';
+			--check if addition works
+			sub <= '0';
+			wait for clk_period*2;
+			report "check addition";
+			assert result = std_ulogic_vector(to_unsigned(local_result,8)) report "failed to calculate the addition, result=" & to_string(result) & " /= " & to_string(local_result);
+		end procedure;
+
+		procedure uut_sub(input1 : integer; input2 : integer) is 
+			constant local_input1_vec : std_ulogic_vector(DATA_WIDTH-1 downto 0) := std_ulogic_vector(std_ulogic_vector(to_unsigned(input1,8)));
+			constant local_input2_vec : std_ulogic_vector(DATA_WIDTH-1 downto 0) := std_ulogic_vector(std_ulogic_vector(to_unsigned(input2,8)));
+			constant local_result : integer := input1-input2;
+		begin 
+			--btn1 press and store input1
+			report "store data in input1";
+			operand_data_in <= local_input1_vec;
+			press_btn(btn_operand1);
+			assert operand1 = local_input1_vec report "failed storing input1 into operand1 = " & to_string(operand1) & " /= " & to_string(local_input1_vec);
+
+			--btn2 press and store input2
+			report "store data in input2";
+			operand_data_in <= local_input2_vec;
+			press_btn(btn_operand2);
+			assert operand2 = local_input2_vec report "failed storing input2 into operand2 = " & to_string(operand2) & " /= " & to_string(local_input2_vec);
+
+			--check if subraction works
+			sub <= '1';
+			wait for clk_period*2;
+			report "check subtraction";
+			assert result = std_ulogic_vector(to_unsigned(local_result,8)) report "failed to calculate the subtraction, result=" & to_string(result) & " /= " & to_string(local_result);
+		end procedure;
+
+		procedure reset is 
+		begin 
+			wait for 5*clk_period;
+			report "start reset";
+			--reset
+			res_n <= '0';
+			wait for 5*clk_period;
+			wait until rising_edge(clk); 
+
+			report "reset off";
+			operand_data_in <= (others=>'0');
+			res_n <= '1';
+			store_operand1 <= '1';
+			store_operand2 <= '1';
+			sub <= '0';
+			wait for 5*clk_period;
+			wait until rising_edge(clk); 
+		end procedure;
 
 	begin
 		report "start sim";
-		wait for 5*clk_period;
-		report "start reset";
 		--reset
-		res_n <= '0';
-		wait for 5*clk_period;
-		wait until rising_edge(clk); 
-
-		report "reset off";
-		operand_data_in <= (others=>'0');
-		res_n <= '1';
-		store_operand1 <= '1';
-		store_operand2 <= '1';
-		sub <= '0';
-		wait for 5*clk_period;
-		wait until rising_edge(clk); 
-
-		--simulate btn_press
-		operand_data_in <= x"BA";
-		btn_press(btn_operand1);
-		operand_data_in <= x"AB";
-		btn_press(btn_operand1);
-
-
-		--btn_press(btn_operand2);
+		reset;
 
 		--simulate add/sub
+		uut_add(10,10);
+		uut_add(15,5);
+		uut_add(19,8);
+		uut_add(100,1);
 
+		uut_sub(10,10);
+		uut_sub(15,5);
+		uut_sub(19,8);
+		uut_sub(100,1);
+
+
+		--grindiger counter
+		report "start grindiger counter";
+		for i in 0 to 100 loop
+			uut_add(i,0);
+		end loop;
 
 		
 		--stop sim

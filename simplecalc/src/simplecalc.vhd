@@ -52,7 +52,7 @@ begin
 
 				--same for operand2 transition
 				if local_store_operand2_n='1' and store_operand2='0' then 
-					local_op1 <= operand_data_in;
+					local_op2 <= operand_data_in;
 				end if;
 
 				--store the operand information 
