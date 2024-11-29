@@ -22,6 +22,8 @@ architecture tb of lfsr_tb is
 
 	signal load_seed_n : std_ulogic;
 	signal seed: std_ulogic_vector(LFSR_WIDTH-1 downto 0) := (others => '0');
+
+
 	--en? signals
 	--signal en : std_ulogic;
 	--seq? signals
