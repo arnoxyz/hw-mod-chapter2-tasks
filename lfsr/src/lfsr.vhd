@@ -27,12 +27,15 @@ begin
 			x <= (others=>'0'); --async reset all ff to 0
         elsif rising_edge(clk) then 
 
+			--TODO: does not really work.
 			-- special case for x(0) 
 			for i in 0 to LFSR_WIDTH-1  loop
 				for j in 0 to LFSR_WIDTH-1 loop
 					if POLYNOMIAL(i) = '1' and POLYNOMIAL(j) = '1' then 
 						if i /= j then 
+							report to_string(x(0)) & " " & to_string(x(i)) & " " & to_string(x(j));
 							x(0) <= x(i) xor x(j);
+							--how to xor more than two inputs?
 						end if;
 					end if;
 				end loop;
