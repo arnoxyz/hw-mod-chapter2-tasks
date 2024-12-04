@@ -18,10 +18,10 @@ end entity;
 architecture arch of lfsr is
 	-- Add signals as required
 	signal x : std_ulogic_vector(LFSR_WIDTH-1 downto 0);
-	signal y : std_ulogic_vector(LFSR_WIDTH-1 downto 0);
 begin
 	--4 bit linear feedback register
     process(clk, res_n) is 
+	variable help : std_ulogic := '0';
     begin 
         if res_n = '0' then 
 			x <= (others=>'0'); --async reset all ff to 0
@@ -30,16 +30,12 @@ begin
 			--TODO: does not really work.
 			-- special case for x(0) 
 			for i in 0 to LFSR_WIDTH-1  loop
-				for j in 0 to LFSR_WIDTH-1 loop
-					if POLYNOMIAL(i) = '1' and POLYNOMIAL(j) = '1' then 
-						if i /= j then 
-							report to_string(x(0)) & " " & to_string(x(i)) & " " & to_string(x(j));
-							x(0) <= x(i) xor x(j);
-							--how to xor more than two inputs?
-						end if;
+				if POLYNOMIAL(i) = '1' then
+					help := help xor x(i);
+					report "help=" & to_string(help) & " i=" & to_string(i) & " x(i)=" & to_string(x(i));
 					end if;
-				end loop;
 			end loop;
+			x(0) <= help;
 			
 			--shift register
 			for i in 1 to LFSR_WIDTH-1 loop 
