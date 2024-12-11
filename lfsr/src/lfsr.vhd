@@ -26,14 +26,11 @@ begin
         if res_n = '0' then 
 			x <= (others=>'0'); --async reset all ff to 0
         elsif rising_edge(clk) then 
-
-			--TODO: does not really work.
 			-- special case for x(0) 
 			for i in 0 to LFSR_WIDTH-1  loop
 				if POLYNOMIAL(i) = '1' then
 					help := help xor x(i);
-					report "help=" & to_string(help) & " i=" & to_string(i) & " x(i)=" & to_string(x(i));
-					end if;
+				end if;
 			end loop;
 			x(0) <= help;
 			
